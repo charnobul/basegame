@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hamster Combat Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>Hamster Combat Game</h1>
+            <div id="user-info">
+                <span id="username"></span>
+            </div>
+        </header>
+        <main>
+            <div id="registration">
+                <h2>Регистрация</h2>
+                <input type="text" id="nickname" placeholder="Введите ник">
+                <button id="register-btn">Зарегистрироваться</button>
+            </div>
+            <div id="game" style="display:none;">
+                <button id="play-btn">Играть</button>
+                <div id="coin">
+                    <p>Монеты: <span id="coin-count">0</span></p>
+                    <button id="click-coin">Кликни меня</button>
+                </div>
+                <div id="leaderboard">
+                    <h3>Топ игроков</h3>
+                    <ol id="top-players">
+                        <!-- Тут будут отображаться лучшие игроки -->
+                    </ol>
+                </div>
+                <div id="shop">
+                    <h3>Магазин</h3>
+                    <button id="upgrade-click">Улучшение клика (50 монет)</button>
+                    <button id="upgrade-income">Улучшение прибыли в секунду (50 монет)</button>
+                </div>
+                <button id="transfer-btn">Переводы</button>
+            </div>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
+
