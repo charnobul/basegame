@@ -1,50 +1,46 @@
 /* styles.css */
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f0f0f0;
-  text-align: center;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
-.container {
-  max-width: 600px;
-  margin: 20px auto;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+#app {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    text-align: center;
 }
 
-h1 {
-  color: #333;
+header {
+    margin-bottom: 20px;
+}
+
+#registration, #game {
+    margin-top: 20px;
+}
+
+#coin {
+    margin-top: 20px;
+}
+
+#shop {
+    margin-top: 20px;
 }
 
 button {
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  margin: 10px;
+    padding: 10px 15px;
+    margin-top: 10px;
+    cursor: pointer;
 }
 
-button:hover {
-  background-color: #0056b3;
-}
-
-input[type="text"],
-input[type="number"] {
-  padding: 10px;
-  font-size: 16px;
-  margin: 5px;
-  width: 200px;
-}
-
-#top-list {
-  list-style-type: none;
-  padding: 0;
-}
-
-#top-list li {
-  margin-bottom: 5px;
+#user-info {
+    text-align: right;
 }
