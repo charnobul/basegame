@@ -10,6 +10,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const upgradeClickBtn = document.getElementById('upgrade-click');
     const upgradeIncomeBtn = document.getElementById('upgrade-income');
     const transferBtn = document.getElementById('transfer-btn');
+    const transferDiv = document.getElementById('transfer');
+    const playerList = document.getElementById('player-list');
+    const transferAmountInput = document.getElementById('transfer-amount');
+    const transferConfirmBtn = document.getElementById('transfer-confirm-btn');
 
     let username = localStorage.getItem('username') || '';
     let coinCount = parseInt(localStorage.getItem('coinCount')) || 0;
@@ -17,7 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let incomeValue = parseInt(localStorage.getItem('incomeValue')) || 0;
     let upgradeClickCost = parseInt(localStorage.getItem('upgradeClickCost')) || 50;
     let upgradeIncomeCost = parseInt(localStorage.getItem('upgradeIncomeCost')) || 50;
-    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+    let registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+    let userCoins = JSON.parse(localStorage.getItem('userCoins')) || {};
 
     const saveState = () => {
         localStorage.setItem('username', username);
@@ -27,6 +32,19 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('upgradeClickCost', upgradeClickCost);
         localStorage.setItem('upgradeIncomeCost', upgradeIncomeCost);
         localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+        localStorage.setItem('userCoins', JSON.stringify(userCoins));
+    };
+
+    const updatePlayerList = () => {
+        playerList.innerHTML = '';
+        registeredUsers.forEach(user => {
+            if (user !== username) {
+                const option = document.createElement('option');
+                option.value = user;
+                option.textContent = user;
+                playerList.appendChild(option);
+            }
+        });
     };
 
     if (username) {
@@ -34,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
         registrationDiv.style.display = 'none';
         gameDiv.style.display = 'block';
         coinCountDisplay.textContent = coinCount;
+        updatePlayerList();
     }
 
     registerBtn.addEventListener('click', () => {
@@ -44,9 +63,11 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 username = newUsername;
                 registeredUsers.push(username);
+                userCoins[username] = 0;
                 usernameDisplay.textContent = username;
                 registrationDiv.style.display = 'none';
                 gameDiv.style.display = 'block';
+                updatePlayerList();
                 saveState();
             }
         } else {
@@ -57,6 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
     clickCoinBtn.addEventListener('click', () => {
         coinCount += clickValue;
         coinCountDisplay.textContent = coinCount;
+        userCoins[username] = coinCount;
         saveState();
     });
 
@@ -67,6 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
             upgradeClickCost = Math.floor(upgradeClickCost * 3);
             coinCountDisplay.textContent = coinCount;
             upgradeClickBtn.textContent = `Улучшение клика (${upgradeClickCost} монет)`;
+            userCoins[username] = coinCount;
             saveState();
         } else {
             alert('Недостаточно монет для улучшения.');
@@ -80,6 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
             upgradeIncomeCost = Math.floor(upgradeIncomeCost * 1.5);
             coinCountDisplay.textContent = coinCount;
             upgradeIncomeBtn.textContent = `Улучшение прибыли в секунду (${upgradeIncomeCost} монет)`;
+            userCoins[username] = coinCount;
             saveState();
         } else {
             alert('Недостаточно монет для улучшения.');
@@ -89,6 +113,27 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(() => {
         coinCount += incomeValue;
         coinCountDisplay.textContent = coinCount;
+        userCoins[username] = coinCount;
         saveState();
     }, 1000);
+
+    transferBtn.addEventListener('click', () => {
+        transferDiv.style.display = 'block';
+    });
+
+    transferConfirmBtn.addEventListener('click', () => {
+        const recipient = playerList.value;
+        const transferAmount = parseInt(transferAmountInput.value);
+        if (recipient && transferAmount > 0 && transferAmount <= coinCount) {
+            coinCount -= transferAmount;
+            userCoins[username] = coinCount;
+            userCoins[recipient] = (userCoins[recipient] || 0) + transferAmount;
+            coinCountDisplay.textContent = coinCount;
+            alert(`Вы перевели ${transferAmount} монет игроку ${recipient}`);
+            saveState();
+        } else {
+            alert('Недостаточно монет для перевода или неверная сумма.');
+        }
+        transferAmountInput.value = '';
+    });
 });
