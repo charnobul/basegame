@@ -37,13 +37,14 @@
                     <button id="upgrade-income">Улучшение прибыли в секунду (50 монет)</button>
                 </div>
                 <button id="transfer-btn">Переводы</button>
-            </div>
-            <div id="transfers" style="display:none;">
-                <h2>Переводы</h2>
-                <select id="transfer-user-list"></select>
-                <input type="number" id="transfer-amount" placeholder="Сумма">
-                <button id="send-transfer-btn">Перевести</button>
-                <button id="back-btn">Назад</button>
+                <div id="transfer" style="display:none;">
+                    <h3>Перевод монет</h3>
+                    <select id="player-list">
+                        <!-- Список игроков -->
+                    </select>
+                    <input type="number" id="transfer-amount" placeholder="Сумма перевода">
+                    <button id="transfer-confirm-btn">Подтвердить перевод</button>
+                </div>
             </div>
         </main>
     </div>
