@@ -12,10 +12,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const applyCode = document.getElementById('applyCode');
     const loginPassword = document.getElementById('loginPassword');
     const loginAttemptsDisplay = document.getElementById('loginAttempts');
+    const clickUpgradeCostDisplay = document.getElementById('clickUpgradeCost');
 
     let balance = 0;
     let clickValue = 0.01;
     let upgradeCost = 100;
+    let clickUpgrades = 0;
     let loginAttempts = 0;
 
     let devClicks = [];
@@ -29,6 +31,11 @@ document.addEventListener('DOMContentLoaded', function () {
     if (localStorage.getItem('userPassword')) {
         login.classList.remove('hidden');
         updateLoginAttempts();
+        balance = parseFloat(localStorage.getItem('balance'));
+        clickUpgrades = parseInt(localStorage.getItem('clickUpgrades')) || 0;
+        upgradeCost = calculateUpgradeCost();
+        updateClickUpgradeCost();
+        updateBalance();
     } else {
         registration.classList.remove('hidden');
     }
@@ -41,6 +48,7 @@ document.addEventListener('DOMContentLoaded', function () {
         localStorage.setItem('userName', userName);
         localStorage.setItem('userPassword', encrypt(userPassword));
         localStorage.setItem('balance', '0');
+        localStorage.setItem('clickUpgrades', '0');
         localStorage.setItem('loginAttempts', '0');
 
         registration.classList.add('hidden');
@@ -54,8 +62,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (decrypt(localStorage.getItem('userPassword')) === userPassword) {
             balance = parseFloat(localStorage.getItem('balance'));
+            clickUpgrades = parseInt(localStorage.getItem('clickUpgrades')) || 0;
+            upgradeCost = calculateUpgradeCost();
             bank.classList.remove('hidden');
             login.classList.add('hidden');
+            updateClickUpgradeCost();
             updateBalance();
         } else {
             loginAttempts++;
@@ -80,8 +91,10 @@ document.addEventListener('DOMContentLoaded', function () {
         if (balance >= upgradeCost) {
             balance -= upgradeCost;
             clickValue += 0.01;
-            upgradeCost *= 1.5;
+            clickUpgrades++;
+            upgradeCost = calculateUpgradeCost();
             upgradeClick.innerText = `Прокачать клик (+${clickValue.toFixed(2)} монет)`;
+            updateClickUpgradeCost();
             updateBalance();
             saveBalance();
         } else {
@@ -178,6 +191,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         }
+    }
+
+    function calculateUpgradeCost() {
+        return Math.ceil(100 * Math.pow(1.5, clickUpgrades));
+    }
+
+    function updateClickUpgradeCost() {
+        clickUpgradeCostDisplay.innerText = `Стоимость прокачки клика: ${upgradeCost.toFixed(2)} монет`;
     }
 
     function encrypt(value) {
