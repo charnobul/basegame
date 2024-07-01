@@ -13,12 +13,17 @@ document.addEventListener('DOMContentLoaded', function () {
     const loginPassword = document.getElementById('loginPassword');
     const loginAttemptsDisplay = document.getElementById('loginAttempts');
     const clickUpgradeCostDisplay = document.getElementById('clickUpgradeCost');
+    const changePasswordBtn = document.getElementById('changePasswordBtn');
+    const changePasswordForm = document.getElementById('changePasswordForm');
+    const changePasswordPassword = document.getElementById('changePasswordPassword');
+    const applyNewPasswordBtn = document.getElementById('applyNewPassword');
+    const newPassword = document.getElementById('newPassword');
 
     let balance = 0;
     let clickValue = 0.01;
     let upgradeCost = 100;
     let clickUpgrades = 0;
-    let loginAttempts = 0;
+    let loginAttempts = 5; // Начальное количество попыток входа
 
     let devClicks = [];
     const devSequence = ['top-left', 'top-right', 'top-left', 'top-left', 'bottom-right'];
@@ -30,12 +35,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // Проверка существующих данных
     if (localStorage.getItem('userPassword')) {
         login.classList.remove('hidden');
+        loginAttempts = parseInt(localStorage.getItem('loginAttempts')) || 5;
         updateLoginAttempts();
-        balance = parseFloat(localStorage.getItem('balance'));
-        clickUpgrades = parseInt(localStorage.getItem('clickUpgrades')) || 0;
-        upgradeCost = calculateUpgradeCost();
-        updateClickUpgradeCost();
-        updateBalance();
     } else {
         registration.classList.remove('hidden');
     }
@@ -49,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function () {
         localStorage.setItem('userPassword', encrypt(userPassword));
         localStorage.setItem('balance', '0');
         localStorage.setItem('clickUpgrades', '0');
-        localStorage.setItem('loginAttempts', '0');
+        localStorage.setItem('loginAttempts', '5');
 
         registration.classList.add('hidden');
         bank.classList.remove('hidden');
@@ -61,6 +62,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const userPassword = loginPassword.value;
 
         if (decrypt(localStorage.getItem('userPassword')) === userPassword) {
+            loginAttempts = 5; // Сбросить счетчик попыток при успешном входе
+            localStorage.setItem('loginAttempts', '5');
             balance = parseFloat(localStorage.getItem('balance'));
             clickUpgrades = parseInt(localStorage.getItem('clickUpgrades')) || 0;
             upgradeCost = calculateUpgradeCost();
@@ -69,10 +72,10 @@ document.addEventListener('DOMContentLoaded', function () {
             updateClickUpgradeCost();
             updateBalance();
         } else {
-            loginAttempts++;
-            localStorage.setItem('loginAttempts', loginAttempts);
+            loginAttempts--;
+            localStorage.setItem('loginAttempts', loginAttempts.toString());
             updateLoginAttempts();
-            if (loginAttempts >= 5) {
+            if (loginAttempts <= 0) {
                 localStorage.clear();
                 alert('Слишком много неверных попыток. Данные сброшены.');
                 location.reload();
@@ -93,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function () {
             clickValue += 0.01;
             clickUpgrades++;
             upgradeCost = calculateUpgradeCost();
-            upgradeClick.innerText = `Прокачать клик (+${clickValue.toFixed(2)} монет)`;
+            upgradeClick.innerText = `Прокачать клик (+${clickValue.toFixed(2)} гривны)`;
             updateClickUpgradeCost();
             updateBalance();
             saveBalance();
@@ -124,14 +127,45 @@ document.addEventListener('DOMContentLoaded', function () {
                     case 's': number += '8'; break;
                     case 'j': number += '9'; break;
                     case 'm': number += '0'; break;
+                    default: break;
                 }
             });
-            balance += parseInt(number);
+            const amount = parseFloat(number);
+            if (!isNaN(amount)) {
+                balance += amount;
+            }
         }
+        devCode.value = '';
         updateBalance();
         saveBalance();
-        devMode.classList.add('hidden');
     });
+
+    changePasswordBtn.addEventListener('click', function () {
+        changePasswordForm.classList.toggle('hidden');
+    });
+
+    applyNewPasswordBtn.addEventListener('click', function () {
+        const oldPassword = changePasswordPassword.value.trim();
+        const newPasswordValue = newPassword.value.trim();
+        if (decrypt(localStorage.getItem('userPassword')) === oldPassword) {
+            localStorage.setItem('userPassword', encrypt(newPasswordValue));
+            alert('Пароль успешно изменен!');
+            changePasswordPassword.value = '';
+            newPassword.value = '';
+        } else {
+            alert('Неверный пароль!');
+        }
+    });
+
+    function encrypt(value) {
+        // Простая шифровка для демонстрационных целей
+        return btoa(value);
+    }
+
+    function decrypt(value) {
+        // Расшифровка для демонстрационных целей
+        return atob(value);
+    }
 
     function updateBalance() {
         balanceDisplay.innerText = balance.toFixed(2);
@@ -139,83 +173,35 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function saveBalance() {
         localStorage.setItem('balance', balance.toFixed(2));
+        localStorage.setItem('clickUpgrades', clickUpgrades.toString());
+    }
+
+    function calculateUpgradeCost() {
+        return 100 * Math.pow(1.5, clickUpgrades);
+    }
+
+    function updateClickUpgradeCost() {
+        clickUpgradeCostDisplay.innerText = `Стоимость прокачки клика: ${upgradeCost.toFixed(2)} гривны`;
     }
 
     function updateLoginAttempts() {
-        loginAttempts = parseInt(localStorage.getItem('loginAttempts')) || 0;
-        loginAttemptsDisplay.innerText = `Осталось попыток: ${5 - loginAttempts}`;
+        loginAttemptsDisplay.innerText = `Осталось попыток: ${loginAttempts}`;
     }
 
-    function handleDevClick(e) {
-        const now = Date.now();
-        const rect = coin.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        let position = '';
-        if (x < rect.width / 2 && y < rect.height / 2) {
-            position = 'top-left';
-        } else if (x > rect.width / 2 && y < rect.height / 2) {
-            position = 'top-right';
-        } else if (x > rect.width / 2 && y > rect.height / 2) {
-            position = 'bottom-right';
-        }
-
-        if (devClicks.length === 0 || (now - lastClickTime <= maxDelay)) {
-            devClicks.push(position);
+    function handleDevClick(event) {
+        const currentTime = new Date().getTime();
+        if (currentTime - lastClickTime <= maxDelay) {
+            devClicks.push(event.target.id);
             if (devClicks.length === devSequence.length) {
-                if (devClicks.join('') === devSequence.join('')) {
-                    requestDeveloperPassword();
+                const validSequence = devClicks.every((click, index) => click === devSequence[index]);
+                if (validSequence) {
+                    devMode.classList.remove('hidden');
                 }
                 devClicks = [];
             }
         } else {
-            devClicks = [position];
+            devClicks = [];
         }
-        lastClickTime = now;
-    }
-
-    function requestDeveloperPassword() {
-        let attempts = 3;
-        while (attempts > 0) {
-            const password = prompt('Введите пароль для режима разработчика:');
-            if (password === secretKey) {
-                devMode.classList.remove('hidden');
-                return;
-            } else {
-                attempts--;
-                if (attempts > 0) {
-                    alert(`Неверный пароль. Осталось попыток: ${attempts}`);
-                } else {
-                    alert('Слишком много неверных попыток. Попробуйте позже.');
-                }
-            }
-        }
-    }
-
-    function calculateUpgradeCost() {
-        return Math.ceil(100 * Math.pow(1.5, clickUpgrades));
-    }
-
-    function updateClickUpgradeCost() {
-        clickUpgradeCostDisplay.innerText = `Стоимость прокачки клика: ${upgradeCost.toFixed(2)} монет`;
-    }
-
-    function encrypt(value) {
-        // Простой XOR шифр
-        let result = '';
-        for (let i = 0; i < value.length; i++) {
-            result += String.fromCharCode(value.charCodeAt(i) ^ 13);
-        }
-        return result;
-    }
-
-    function decrypt(value) {
-        // Простой XOR шифр (для дешифровки)
-        let result = '';
-        for (let i = 0; i < value.length; i++) {
-            result += String.fromCharCode(value.charCodeAt(i) ^ 13);
-        }
-        return result;
+        lastClickTime = currentTime;
     }
 });
