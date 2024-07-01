@@ -1,53 +1,53 @@
 body {
     font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #00a8e6, #0073aa);
+    background: linear-gradient(180deg, #d9064f 0%, #1d2b64 100%);
     color: #333;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
     margin: 0;
+    padding: 0;
 }
 
-.container {
-    background-color: rgba(255, 255, 255, 0.9);
-    border: 2px solid #4CAF50;
-    border-radius: 10px;
+#bank {
+    max-width: 600px;
+    margin: 20px auto;
+    background-color: #fff;
     padding: 20px;
+    border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+button {
+    background-color: #d9064f;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #1d2b64;
 }
 
 .hidden {
     display: none;
 }
 
-#coin {
-    width: 100px;
-    height: 100px;
-    background-color: #4CAF50;
-    margin: 20px auto;
-    cursor: pointer;
+input[type="password"], input[type="text"] {
+    padding: 8px;
+    margin: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
 }
 
-button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
+#devMode {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
     margin-top: 10px;
 }
 
-button:hover {
-    background-color: #45a049;
-}
-
-h2, h3 {
-    text-align: center;
-}
-
-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+#changePasswordForm {
+    margin-top: 10px;
 }
