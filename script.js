@@ -1,75 +1,200 @@
-// script.js
-let password = "ponchik098";
-let attempts = 5;
-let balance = 0;
-let clickValue = 0.01;
-let upgradeCost = 100;
-let clickMultiplier = 1.5;
+document.addEventListener('DOMContentLoaded', function () {
+    const registrationForm = document.getElementById('registrationForm');
+    const loginForm = document.getElementById('loginForm');
+    const registration = document.getElementById('registration');
+    const login = document.getElementById('login');
+    const bank = document.getElementById('bank');
+    const balanceDisplay = document.getElementById('balance');
+    const coin = document.getElementById('coin');
+    const upgradeClick = document.getElementById('upgradeClick');
+    const devMode = document.getElementById('devMode');
+    const devCode = document.getElementById('devCode');
+    const applyCode = document.getElementById('applyCode');
+    const loginPassword = document.getElementById('loginPassword');
+    const loginAttemptsDisplay = document.getElementById('loginAttempts');
 
-const passwordInput = document.getElementById('passwordInput');
-const attemptsLeft = document.getElementById('attemptsLeft');
-const balanceDisplay = document.getElementById('balance');
-const upgradeCostDisplay = document.getElementById('upgradeCost');
-const loginSection = document.getElementById('loginSection');
-const gameSection = document.getElementById('gameSection');
-const developerSection = document.getElementById('developerSection');
-const developerCodeInput = document.getElementById('developerCodeInput');
+    let balance = 0;
+    let clickValue = 0.01;
+    let upgradeCost = 100;
+    let loginAttempts = 0;
 
-function login() {
-    let passwordAttempt = passwordInput.value;
-    if (passwordAttempt === password) {
-        attempts = 5;
-        attemptsLeft.textContent = attempts;
-        passwordInput.value = '';
-        loginSection.classList.add('hidden');
-        gameSection.classList.remove('hidden');
-        updateBalance();
+    let devClicks = [];
+    const devSequence = ['top-left', 'top-right', 'top-left', 'top-left', 'bottom-right'];
+    const maxDelay = 3000; // 3 seconds
+    let lastClickTime = 0;
+
+    const secretKey = 'ponchik098';
+
+    // Проверка существующих данных
+    if (localStorage.getItem('userPassword')) {
+        login.classList.remove('hidden');
+        updateLoginAttempts();
     } else {
-        attempts--;
-        attemptsLeft.textContent = attempts;
-        if (attempts === 0) {
-            alert('Вы использовали все попытки. Пожалуйста, попробуйте позже.');
-            passwordInput.disabled = true;
+        registration.classList.remove('hidden');
+    }
+
+    registrationForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const userName = document.getElementById('name').value;
+        const userPassword = document.getElementById('password').value;
+
+        localStorage.setItem('userName', userName);
+        localStorage.setItem('userPassword', encrypt(userPassword));
+        localStorage.setItem('balance', '0');
+        localStorage.setItem('loginAttempts', '0');
+
+        registration.classList.add('hidden');
+        bank.classList.remove('hidden');
+        updateBalance();
+    });
+
+    loginForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const userPassword = loginPassword.value;
+
+        if (decrypt(localStorage.getItem('userPassword')) === userPassword) {
+            balance = parseFloat(localStorage.getItem('balance'));
+            bank.classList.remove('hidden');
+            login.classList.add('hidden');
+            updateBalance();
+        } else {
+            loginAttempts++;
+            localStorage.setItem('loginAttempts', loginAttempts);
+            updateLoginAttempts();
+            if (loginAttempts >= 5) {
+                localStorage.clear();
+                alert('Слишком много неверных попыток. Данные сброшены.');
+                location.reload();
+            }
+        }
+    });
+
+    coin.addEventListener('click', function (e) {
+        balance += clickValue;
+        updateBalance();
+        saveBalance();
+        handleDevClick(e);
+    });
+
+    upgradeClick.addEventListener('click', function () {
+        if (balance >= upgradeCost) {
+            balance -= upgradeCost;
+            clickValue += 0.01;
+            upgradeCost *= 1.5;
+            upgradeClick.innerText = `Прокачать клик (+${clickValue.toFixed(2)} монет)`;
+            updateBalance();
+            saveBalance();
+        } else {
+            alert('Недостаточно средств для прокачки!');
+        }
+    });
+
+    applyCode.addEventListener('click', function () {
+        const code = devCode.value.trim();
+        if (code.startsWith('-')) {
+            const amount = parseFloat(code.slice(1));
+            if (!isNaN(amount)) {
+                balance -= amount;
+            }
+        } else if (code.startsWith('=')) {
+            const letters = code.slice(1).split('');
+            let number = '';
+            letters.forEach(letter => {
+                switch (letter) {
+                    case 'h': number += '1'; break;
+                    case 'k': number += '2'; break;
+                    case 'r': number += '3'; break;
+                    case 'v': number += '4'; break;
+                    case 'p': number += '5'; break;
+                    case 'z': number += '6'; break;
+                    case 'e': number += '7'; break;
+                    case 's': number += '8'; break;
+                    case 'j': number += '9'; break;
+                    case 'm': number += '0'; break;
+                }
+            });
+            balance += parseInt(number);
+        }
+        updateBalance();
+        saveBalance();
+        devMode.classList.add('hidden');
+    });
+
+    function updateBalance() {
+        balanceDisplay.innerText = balance.toFixed(2);
+    }
+
+    function saveBalance() {
+        localStorage.setItem('balance', balance.toFixed(2));
+    }
+
+    function updateLoginAttempts() {
+        loginAttempts = parseInt(localStorage.getItem('loginAttempts')) || 0;
+        loginAttemptsDisplay.innerText = `Осталось попыток: ${5 - loginAttempts}`;
+    }
+
+    function handleDevClick(e) {
+        const now = Date.now();
+        const rect = coin.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        let position = '';
+        if (x < rect.width / 2 && y < rect.height / 2) {
+            position = 'top-left';
+        } else if (x > rect.width / 2 && y < rect.height / 2) {
+            position = 'top-right';
+        } else if (x > rect.width / 2 && y > rect.height / 2) {
+            position = 'bottom-right';
+        }
+
+        if (devClicks.length === 0 || (now - lastClickTime <= maxDelay)) {
+            devClicks.push(position);
+            if (devClicks.length === devSequence.length) {
+                if (devClicks.join('') === devSequence.join('')) {
+                    requestDeveloperPassword();
+                }
+                devClicks = [];
+            }
+        } else {
+            devClicks = [position];
+        }
+        lastClickTime = now;
+    }
+
+    function requestDeveloperPassword() {
+        let attempts = 3;
+        while (attempts > 0) {
+            const password = prompt('Введите пароль для режима разработчика:');
+            if (password === secretKey) {
+                devMode.classList.remove('hidden');
+                return;
+            } else {
+                attempts--;
+                if (attempts > 0) {
+                    alert(`Неверный пароль. Осталось попыток: ${attempts}`);
+                } else {
+                    alert('Слишком много неверных попыток. Попробуйте позже.');
+                }
+            }
         }
     }
-}
 
-function updateBalance() {
-    balanceDisplay.textContent = balance.toFixed(2);
-}
-
-function clickCoin() {
-    coin.classList.add('clicked');
-    setTimeout(() => {
-        coin.classList.remove('clicked');
-    }, 200); // Удаляем класс 'clicked' через 200 мс
-
-    balance += clickValue;
-    updateBalance();
-}
-
-const coin = document.getElementById('coin');
-coin.addEventListener('click', clickCoin);
-
-function buyUpgrade() {
-    if (balance >= upgradeCost) {
-        balance -= upgradeCost;
-        clickValue *= clickMultiplier;
-        upgradeCost *= clickMultiplier;
-        updateBalance();
-        upgradeCostDisplay.textContent = upgradeCost.toFixed(2);
-    } else {
-        alert('Недостаточно гривен для покупки улучшения клика!');
+    function encrypt(value) {
+        // Простой XOR шифр
+        let result = '';
+        for (let i = 0; i < value.length; i++) {
+            result += String.fromCharCode(value.charCodeAt(i) ^ 13);
+        }
+        return result;
     }
-}
 
-function enterDeveloperMode() {
-    const code = developerCodeInput.value;
-    if (code === "jjj") {
-        developerCodeInput.value = '';
-        developerSection.classList.add('hidden');
-        // Добавьте код для входа в режим разработчика
-    } else {
-        alert('Неверный код. Пожалуйста, попробуйте снова.');
+    function decrypt(value) {
+        // Простой XOR шифр (для дешифровки)
+        let result = '';
+        for (let i = 0; i < value.length; i++) {
+            result += String.fromCharCode(value.charCodeAt(i) ^ 13);
+        }
+        return result;
     }
-}
+});
