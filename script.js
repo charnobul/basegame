@@ -23,6 +23,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const maxDelay = 3000; // 3 seconds
     let lastClickTime = 0;
 
+    const secretKey = 'ponchik098';
+
     // Проверка существующих данных
     if (localStorage.getItem('userPassword')) {
         login.classList.remove('hidden');
@@ -37,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const userPassword = document.getElementById('password').value;
 
         localStorage.setItem('userName', userName);
-        localStorage.setItem('userPassword', userPassword);
+        localStorage.setItem('userPassword', encrypt(userPassword));
         localStorage.setItem('balance', '0');
         localStorage.setItem('loginAttempts', '0');
 
@@ -50,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function () {
         e.preventDefault();
         const userPassword = loginPassword.value;
 
-        if (userPassword === localStorage.getItem('userPassword')) {
+        if (decrypt(localStorage.getItem('userPassword')) === userPassword) {
             balance = parseFloat(localStorage.getItem('balance'));
             bank.classList.remove('hidden');
             login.classList.add('hidden');
@@ -88,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     applyCode.addEventListener('click', function () {
-        const code = devCode.value.trim();
+        const code = decrypt(devCode.value.trim());
         if (code.startsWith('-')) {
             const amount = parseFloat(code.slice(1));
             if (!isNaN(amount)) {
@@ -96,20 +98,22 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         } else if (code.startsWith('=')) {
             const letters = code.slice(1).split('');
+            let number = '';
             letters.forEach(letter => {
                 switch (letter) {
-                    case 'h': balance += 1; break;
-                    case 'k': balance += 2; break;
-                    case 'r': balance += 3; break;
-                    case 'v': balance += 4; break;
-                    case 'p': balance += 5; break;
-                    case 'z': balance += 6; break;
-                    case 'e': balance += 7; break;
-                    case 's': balance += 8; break;
-                    case 'j': balance += 9; break;
-                    case 'm': balance += 0; break;
+                    case 'h': number += '1'; break;
+                    case 'k': number += '2'; break;
+                    case 'r': number += '3'; break;
+                    case 'v': number += '4'; break;
+                    case 'p': number += '5'; break;
+                    case 'z': number += '6'; break;
+                    case 'e': number += '7'; break;
+                    case 's': number += '8'; break;
+                    case 'j': number += '9'; break;
+                    case 'm': number += '0'; break;
                 }
             });
+            balance += parseInt(number);
         }
         updateBalance();
         saveBalance();
@@ -148,7 +152,7 @@ document.addEventListener('DOMContentLoaded', function () {
             devClicks.push(position);
             if (devClicks.length === devSequence.length) {
                 if (devClicks.join('') === devSequence.join('')) {
-                    devMode.classList.remove('hidden');
+                    requestDeveloperPassword();
                 }
                 devClicks = [];
             }
@@ -156,5 +160,41 @@ document.addEventListener('DOMContentLoaded', function () {
             devClicks = [position];
         }
         lastClickTime = now;
+    }
+
+    function requestDeveloperPassword() {
+        let attempts = 3;
+        while (attempts > 0) {
+            const password = prompt('Введите пароль для режима разработчика:');
+            if (password === secretKey) {
+                devMode.classList.remove('hidden');
+                return;
+            } else {
+                attempts--;
+                if (attempts > 0) {
+                    alert(`Неверный пароль. Осталось попыток: ${attempts}`);
+                } else {
+                    alert('Слишком много неверных попыток. Попробуйте позже.');
+                }
+            }
+        }
+    }
+
+    function encrypt(value) {
+        // Простой XOR шифр
+        let result = '';
+        for (let i = 0; i < value.length; i++) {
+            result += String.fromCharCode(value.charCodeAt(i) ^ 13);
+        }
+        return result;
+    }
+
+    function decrypt(value) {
+        // Простой XOR шифр (для дешифровки)
+        let result = '';
+        for (let i = 0; i < value.length; i++) {
+            result += String.fromCharCode(value.charCodeAt(i) ^ 13);
+        }
+        return result;
     }
 });
