@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
     const registrationForm = document.getElementById('registrationForm');
+    const loginForm = document.getElementById('loginForm');
     const registration = document.getElementById('registration');
+    const login = document.getElementById('login');
     const bank = document.getElementById('bank');
     const balanceDisplay = document.getElementById('balance');
     const coin = document.getElementById('coin');
@@ -8,20 +10,62 @@ document.addEventListener('DOMContentLoaded', function () {
     const devMode = document.getElementById('devMode');
     const devCode = document.getElementById('devCode');
     const applyCode = document.getElementById('applyCode');
+    const loginPassword = document.getElementById('loginPassword');
+    const loginAttemptsDisplay = document.getElementById('loginAttempts');
 
     let balance = 0;
     let clickValue = 0.01;
     let upgradeCost = 100;
+    let loginAttempts = 0;
+
+    // Проверка существующих данных
+    if (localStorage.getItem('userPassword')) {
+        login.classList.remove('hidden');
+        updateLoginAttempts();
+    } else {
+        registration.classList.remove('hidden');
+    }
 
     registrationForm.addEventListener('submit', function (e) {
         e.preventDefault();
+        const userName = document.getElementById('name').value;
+        const userPassword = document.getElementById('password').value;
+
+        localStorage.setItem('userName', userName);
+        localStorage.setItem('userPassword', userPassword);
+        localStorage.setItem('balance', '0');
+        localStorage.setItem('loginAttempts', '0');
+
         registration.classList.add('hidden');
         bank.classList.remove('hidden');
+        updateBalance();
+    });
+
+    loginForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const userPassword = loginPassword.value;
+
+        if (userPassword === localStorage.getItem('userPassword')) {
+            balance = parseFloat(localStorage.getItem('balance'));
+            bank.classList.remove('hidden');
+            login.classList.add('hidden');
+            updateBalance();
+        } else {
+            loginAttempts++;
+            localStorage.setItem('loginAttempts', loginAttempts);
+            updateLoginAttempts();
+            if (loginAttempts >= 5) {
+                localStorage.clear();
+                alert('Слишком много неверных попыток. Данные сброшены.');
+                location.reload();
+            }
+        }
     });
 
     coin.addEventListener('click', function () {
         balance += clickValue;
         updateBalance();
+        saveBalance();
     });
 
     upgradeClick.addEventListener('click', function () {
@@ -31,14 +75,38 @@ document.addEventListener('DOMContentLoaded', function () {
             upgradeCost *= 1.5;
             upgradeClick.innerText = `Прокачать клик (+${clickValue.toFixed(2)} монет)`;
             updateBalance();
+            saveBalance();
         } else {
             alert('Недостаточно средств для прокачки!');
         }
     });
 
-    document.addEventListener('keydown', function (e) {
-        if (e.key === '2') {
-            devMode.classList.toggle('hidden');
+    // Флаги для отслеживания проведения мыши
+    let isDrawing = false;
+    let startX = 0;
+    let startY = 0;
+    let endX = 0;
+    let endY = 0;
+
+    document.addEventListener('mousedown', function (e) {
+        isDrawing = true;
+        startX = e.pageX;
+        startY = e.pageY;
+    });
+
+    document.addEventListener('mousemove', function (e) {
+        if (isDrawing) {
+            endX = e.pageX;
+            endY = e.pageY;
+        }
+    });
+
+    document.addEventListener('mouseup', function () {
+        if (isDrawing) {
+            isDrawing = false;
+            if (startX < endX && Math.abs(startY - endY) < 50) {
+                devMode.classList.toggle('hidden');
+            }
         }
     });
 
@@ -67,10 +135,20 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
         updateBalance();
+        saveBalance();
         devMode.classList.add('hidden');
     });
 
     function updateBalance() {
         balanceDisplay.innerText = balance.toFixed(2);
+    }
+
+    function saveBalance() {
+        localStorage.setItem('balance', balance.toFixed(2));
+    }
+
+    function updateLoginAttempts() {
+        loginAttempts = parseInt(localStorage.getItem('loginAttempts')) || 0;
+        loginAttemptsDisplay.innerText = `Осталось попыток: ${5 - loginAttempts}`;
     }
 });
