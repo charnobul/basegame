@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     applyCode.addEventListener('click', function () {
-        const code = decrypt(devCode.value.trim());
+        const code = devCode.value.trim();
         if (code.startsWith('-')) {
             const amount = parseFloat(code.slice(1));
             if (!isNaN(amount)) {
