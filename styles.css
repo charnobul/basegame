@@ -1,46 +1,44 @@
-/* styles.css */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 0;
+    background-color: #f0f0f0;
+    color: #333;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
+    margin: 0;
 }
 
-#app {
-    background: white;
-    padding: 20px;
+.container {
+    background-color: white;
+    border: 2px solid #ff0000;
     border-radius: 10px;
+    padding: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 300px;
-    text-align: center;
 }
 
-header {
-    margin-bottom: 20px;
-}
-
-#registration, #game {
-    margin-top: 20px;
+.hidden {
+    display: none;
 }
 
 #coin {
-    margin-top: 20px;
-}
-
-#shop {
-    margin-top: 20px;
-}
-
-button {
-    padding: 10px 15px;
-    margin-top: 10px;
+    width: 100px;
+    height: 100px;
+    background-color: #ff0000;
+    border-radius: 50%;
+    margin: 20px auto;
     cursor: pointer;
 }
 
-#user-info {
-    text-align: right;
+button {
+    background-color: #ff0000;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #cc0000;
 }
