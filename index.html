@@ -8,7 +8,7 @@
 </head>
 <body>
     <div class="container">
-        <div id="registration">
+        <div id="registration" class="hidden">
             <h2>Регистрация</h2>
             <form id="registrationForm">
                 <label for="name">Имя:</label>
@@ -16,6 +16,15 @@
                 <label for="password">Пароль:</label>
                 <input type="password" id="password" required>
                 <button type="submit">Регистрация</button>
+            </form>
+        </div>
+        <div id="login" class="hidden">
+            <h2>Вход</h2>
+            <form id="loginForm">
+                <label for="loginPassword">Пароль:</label>
+                <input type="password" id="loginPassword" required>
+                <button type="submit">Войти</button>
+                <p id="loginAttempts"></p>
             </form>
         </div>
         <div id="bank" class="hidden">
