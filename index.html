@@ -3,49 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Красный Банк</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Виртуальная страна - Банк</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="bank" class="hidden">
-        <h1>Добро пожаловать в Красный Банк</h1>
-        <p>Баланс: <span id="balance">0.00</span> гривны</p>
-        <button id="coin">Нажми, чтобы получить +0.01 гривны</button>
-        <p id="clickUpgradeCost">Стоимость прокачки клика: 100.00 гривны</p>
-        <button id="upgradeClick">Прокачать клик (+0.01 гривны)</button>
-        <div id="devMode" class="hidden">
-            <p>Режим разработчика</p>
-            <label for="devCode">Введите код:</label>
-            <input type="text" id="devCode">
-            <button id="applyCode">Применить</button>
+    <div class="container">
+        <h1>Добро пожаловать в Банк виртуальной страны</h1>
+        <div class="login-section" id="loginSection">
+            <h2>Вход</h2>
+            <input type="password" id="passwordInput" placeholder="Введите пароль">
+            <button onclick="login()">Войти</button>
+            <p>Осталось попыток: <span id="attemptsLeft">5</span></p>
         </div>
-        <button id="changePasswordBtn">Изменить пароль</button>
-        <div id="changePasswordForm" class="hidden">
-            <label for="changePasswordPassword">Подтвердите действие паролем:</label>
-            <input type="password" id="changePasswordPassword">
-            <label for="newPassword">Введите новый пароль:</label>
-            <input type="password" id="newPassword">
-            <button id="applyNewPassword">Применить</button>
+        <div class="game-section hidden" id="gameSection">
+            <h2>Банковский счёт</h2>
+            <p id="balanceDisplay">Баланс: <span id="balance">0</span> гривен</p>
+            <div class="coin-container">
+                <img id="coin" src="coin.png" alt="Coin">
+            </div>
+            <button onclick="buyUpgrade()">Купить улучшение клика (Цена: <span id="upgradeCost">100</span>)</button>
         </div>
-    </div>
-    <div id="login">
-        <h2>Вход</h2>
-        <form id="loginForm">
-            <label for="loginPassword">Введите пароль:</label>
-            <input type="password" id="loginPassword">
-            <button type="submit">Войти</button>
-        </form>
-        <p id="loginAttempts">Осталось попыток: 5</p>
-    </div>
-    <div id="registration" class="hidden">
-        <h2>Регистрация</h2>
-        <form id="registrationForm">
-            <label for="name">Введите имя:</label>
-            <input type="text" id="name" required>
-            <label for="password">Придумайте пароль:</label>
-            <input type="password" id="password" required>
-            <button type="submit">Зарегистрироваться</button>
-        </form>
+        <div class="developer-section hidden" id="developerSection">
+            <h2>Режим разработчика</h2>
+            <p>Введите код:</p>
+            <input type="text" id="developerCodeInput" placeholder="Код">
+            <button onclick="enterDeveloperMode()">Применить</button>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>
