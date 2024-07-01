@@ -3,41 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Банк</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Красный Банк</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <div id="registration" class="hidden">
-            <h2>Регистрация</h2>
-            <form id="registrationForm">
-                <label for="name">Имя:</label>
-                <input type="text" id="name" required>
-                <label for="password">Пароль:</label>
-                <input type="password" id="password" required>
-                <button type="submit">Регистрация</button>
-            </form>
+    <div id="bank" class="hidden">
+        <h1>Добро пожаловать в Красный Банк</h1>
+        <p>Баланс: <span id="balance">0.00</span> гривны</p>
+        <button id="coin">Нажми, чтобы получить +0.01 гривны</button>
+        <p id="clickUpgradeCost">Стоимость прокачки клика: 100.00 гривны</p>
+        <button id="upgradeClick">Прокачать клик (+0.01 гривны)</button>
+        <div id="devMode" class="hidden">
+            <p>Режим разработчика</p>
+            <label for="devCode">Введите код:</label>
+            <input type="text" id="devCode">
+            <button id="applyCode">Применить</button>
         </div>
-        <div id="login" class="hidden">
-            <h2>Вход</h2>
-            <form id="loginForm">
-                <label for="loginPassword">Пароль:</label>
-                <input type="password" id="loginPassword" required>
-                <button type="submit">Войти</button>
-                <p id="loginAttempts"></p>
-            </form>
+        <button id="changePasswordBtn">Изменить пароль</button>
+        <div id="changePasswordForm" class="hidden">
+            <label for="changePasswordPassword">Подтвердите действие паролем:</label>
+            <input type="password" id="changePasswordPassword">
+            <label for="newPassword">Введите новый пароль:</label>
+            <input type="password" id="newPassword">
+            <button id="applyNewPassword">Применить</button>
         </div>
-        <div id="bank" class="hidden">
-            <h2>Ваш баланс: <span id="balance">0.00</span> гривен</h2>
-            <div id="coin" class="coin"></div>
-            <button id="upgradeClick">Прокачать клик (+0.01 монет)</button>
-            <div id="devMode" class="hidden">
-                <h3>Режим разработчика</h3>
-                <label for="devCode">Введите код:</label>
-                <input type="password" id="devCode">
-                <button id="applyCode">Применить</button>
-            </div>
-        </div>
+    </div>
+    <div id="login">
+        <h2>Вход</h2>
+        <form id="loginForm">
+            <label for="loginPassword">Введите пароль:</label>
+            <input type="password" id="loginPassword">
+            <button type="submit">Войти</button>
+        </form>
+        <p id="loginAttempts">Осталось попыток: 5</p>
+    </div>
+    <div id="registration" class="hidden">
+        <h2>Регистрация</h2>
+        <form id="registrationForm">
+            <label for="name">Введите имя:</label>
+            <input type="text" id="name" required>
+            <label for="password">Придумайте пароль:</label>
+            <input type="password" id="password" required>
+            <button type="submit">Зарегистрироваться</button>
+        </form>
     </div>
     <script src="script.js"></script>
 </body>
