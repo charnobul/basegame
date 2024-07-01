@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,46 +7,28 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="app">
-        <header>
-            <h1>Красный Банк</h1>
-            <div id="user-info">
-                <span id="username"></span>
+    <div class="container">
+        <div id="registration">
+            <h2>Регистрация</h2>
+            <form id="registrationForm">
+                <label for="name">Имя:</label>
+                <input type="text" id="name" required>
+                <label for="password">Пароль:</label>
+                <input type="password" id="password" required>
+                <button type="submit">Регистрация</button>
+            </form>
+        </div>
+        <div id="bank" class="hidden">
+            <h2>Ваш баланс: <span id="balance">0.00</span> гривен</h2>
+            <div id="coin" class="coin"></div>
+            <button id="upgradeClick">Прокачать клик (+0.01 монет)</button>
+            <div id="devMode" class="hidden">
+                <h3>Режим разработчика</h3>
+                <label for="devCode">Введите код:</label>
+                <input type="text" id="devCode">
+                <button id="applyCode">Применить</button>
             </div>
-        </header>
-        <main>
-            <div id="registration">
-                <h2>Регистрация</h2>
-                <input type="text" id="nickname" placeholder="Введите ник">
-                <button id="register-btn">Зарегистрироваться</button>
-            </div>
-            <div id="game" style="display:none;">
-                <div id="coin">
-                    <p>Монеты: <span id="coin-count">0</span></p>
-                    <button id="click-coin">Кликни меня</button>
-                </div>
-                <div id="leaderboard">
-                    <h3>Топ игроков</h3>
-                    <ol id="top-players">
-                        <!-- Тут будут отображаться лучшие игроки -->
-                    </ol>
-                </div>
-                <div id="shop">
-                    <h3>Магазин</h3>
-                    <button id="upgrade-click">Улучшение клика (<span id="upgrade-click-cost">50</span> монет)</button>
-                    <button id="upgrade-income">Улучшение прибыли в секунду (<span id="upgrade-income-cost">50</span> монет)</button>
-                </div>
-                <button id="transfer-btn">Переводы</button>
-                <div id="transfer" style="display:none;">
-                    <h3>Перевод монет</h3>
-                    <select id="player-list">
-                        <!-- Список игроков -->
-                    </select>
-                    <input type="number" id="transfer-amount" placeholder="Сумма перевода">
-                    <button id="transfer-confirm-btn">Подтвердить перевод</button>
-                </div>
-            </div>
-        </main>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>
