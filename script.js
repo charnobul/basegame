@@ -18,6 +18,11 @@ document.addEventListener('DOMContentLoaded', function () {
     let upgradeCost = 100;
     let loginAttempts = 0;
 
+    let devClicks = [];
+    const devSequence = ['top-left', 'top-right', 'top-left', 'top-left', 'bottom-right'];
+    const maxDelay = 3000; // 3 seconds
+    let lastClickTime = 0;
+
     // Проверка существующих данных
     if (localStorage.getItem('userPassword')) {
         login.classList.remove('hidden');
@@ -62,10 +67,11 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    coin.addEventListener('click', function () {
+    coin.addEventListener('click', function (e) {
         balance += clickValue;
         updateBalance();
         saveBalance();
+        handleDevClick(e);
     });
 
     upgradeClick.addEventListener('click', function () {
@@ -78,35 +84,6 @@ document.addEventListener('DOMContentLoaded', function () {
             saveBalance();
         } else {
             alert('Недостаточно средств для прокачки!');
-        }
-    });
-
-    // Флаги для отслеживания проведения мыши
-    let isDrawing = false;
-    let startX = 0;
-    let startY = 0;
-    let endX = 0;
-    let endY = 0;
-
-    document.addEventListener('mousedown', function (e) {
-        isDrawing = true;
-        startX = e.pageX;
-        startY = e.pageY;
-    });
-
-    document.addEventListener('mousemove', function (e) {
-        if (isDrawing) {
-            endX = e.pageX;
-            endY = e.pageY;
-        }
-    });
-
-    document.addEventListener('mouseup', function () {
-        if (isDrawing) {
-            isDrawing = false;
-            if (startX < endX && Math.abs(startY - endY) < 50) {
-                devMode.classList.toggle('hidden');
-            }
         }
     });
 
@@ -150,5 +127,34 @@ document.addEventListener('DOMContentLoaded', function () {
     function updateLoginAttempts() {
         loginAttempts = parseInt(localStorage.getItem('loginAttempts')) || 0;
         loginAttemptsDisplay.innerText = `Осталось попыток: ${5 - loginAttempts}`;
+    }
+
+    function handleDevClick(e) {
+        const now = Date.now();
+        const rect = coin.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        let position = '';
+        if (x < rect.width / 2 && y < rect.height / 2) {
+            position = 'top-left';
+        } else if (x > rect.width / 2 && y < rect.height / 2) {
+            position = 'top-right';
+        } else if (x > rect.width / 2 && y > rect.height / 2) {
+            position = 'bottom-right';
+        }
+
+        if (devClicks.length === 0 || (now - lastClickTime <= maxDelay)) {
+            devClicks.push(position);
+            if (devClicks.length === devSequence.length) {
+                if (devClicks.join('') === devSequence.join('')) {
+                    devMode.classList.remove('hidden');
+                }
+                devClicks = [];
+            }
+        } else {
+            devClicks = [position];
+        }
+        lastClickTime = now;
     }
 });
