@@ -7,15 +7,19 @@ document.addEventListener('DOMContentLoaded', function () {
     const balanceDisplay = document.getElementById('balance');
     const coin = document.getElementById('coin');
     const upgradeClick = document.getElementById('upgradeClick');
+    const buyAutoClicker = document.getElementById('buyAutoClicker');
     const devMode = document.getElementById('devMode');
     const devCode = document.getElementById('devCode');
     const applyCode = document.getElementById('applyCode');
     const loginPassword = document.getElementById('loginPassword');
     const loginAttemptsDisplay = document.getElementById('loginAttempts');
+    const achievementsList = document.getElementById('achievements');
 
     let balance = 0;
     let clickValue = 0.01;
     let upgradeCost = 100;
+    let autoClickerCost = 500;
+    let autoClickerInterval;
     let loginAttempts = 0;
 
     let devClicks = [];
@@ -29,6 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (localStorage.getItem('userPassword')) {
         login.classList.remove('hidden');
         updateLoginAttempts();
+        loadProgress();
     } else {
         registration.classList.remove('hidden');
     }
@@ -41,6 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
         localStorage.setItem('userName', userName);
         localStorage.setItem('userPassword', encrypt(userPassword));
         localStorage.setItem('balance', '0');
+        localStorage.setItem('clickValue', clickValue);
         localStorage.setItem('loginAttempts', '0');
 
         registration.classList.add('hidden');
@@ -54,6 +60,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (decrypt(localStorage.getItem('userPassword')) === userPassword) {
             balance = parseFloat(localStorage.getItem('balance'));
+            clickValue = parseFloat(localStorage.getItem('clickValue'));
             bank.classList.remove('hidden');
             login.classList.add('hidden');
             updateBalance();
@@ -72,8 +79,9 @@ document.addEventListener('DOMContentLoaded', function () {
     coin.addEventListener('click', function (e) {
         balance += clickValue;
         updateBalance();
-        saveBalance();
+        saveProgress();
         handleDevClick(e);
+        checkAchievements();
     });
 
     upgradeClick.addEventListener('click', function () {
@@ -81,11 +89,24 @@ document.addEventListener('DOMContentLoaded', function () {
             balance -= upgradeCost;
             clickValue += 0.01;
             upgradeCost *= 1.5;
-            upgradeClick.innerText = `Прокачать клик (+${clickValue.toFixed(2)} монет)`;
+            upgradeClick.innerText = `Прокачать клик (${upgradeCost.toFixed(2)} гривен)`;
             updateBalance();
-            saveBalance();
+            saveProgress();
         } else {
             alert('Недостаточно средств для прокачки!');
+        }
+    });
+
+    buyAutoClicker.addEventListener('click', function () {
+        if (balance >= autoClickerCost) {
+            balance -= autoClickerCost;
+            startAutoClicker();
+            autoClickerCost *= 2;
+            buyAutoClicker.innerText = `Купить автокликер (${autoClickerCost.toFixed(2)} гривен)`;
+            updateBalance();
+            saveProgress();
+        } else {
+            alert('Недостаточно средств для покупки автокликера!');
         }
     });
 
@@ -116,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function () {
             balance += parseInt(number);
         }
         updateBalance();
-        saveBalance();
+        saveProgress();
         devMode.classList.add('hidden');
     });
 
@@ -124,8 +145,16 @@ document.addEventListener('DOMContentLoaded', function () {
         balanceDisplay.innerText = balance.toFixed(2);
     }
 
-    function saveBalance() {
+    function saveProgress() {
         localStorage.setItem('balance', balance.toFixed(2));
+        localStorage.setItem('clickValue', clickValue.toFixed(2));
+    }
+
+    function loadProgress() {
+        balance = parseFloat(localStorage.getItem('balance')) || 0;
+        clickValue = parseFloat(localStorage.getItem('clickValue')) || 0.01;
+        updateBalance();
+        upgradeClick.innerText = `Прокачать клик (${upgradeCost.toFixed(2)} гривен)`;
     }
 
     function updateLoginAttempts() {
@@ -177,6 +206,31 @@ document.addEventListener('DOMContentLoaded', function () {
                     alert('Слишком много неверных попыток. Попробуйте позже.');
                 }
             }
+        }
+    }
+
+    function startAutoClicker() {
+        if (autoClickerInterval) clearInterval(autoClickerInterval);
+        autoClickerInterval = setInterval(function () {
+            balance += clickValue;
+            updateBalance();
+            saveProgress();
+            checkAchievements();
+        }, 1000);
+    }
+
+    function checkAchievements() {
+        if (balance >= 1000 && !document.getElementById('ach1000')) {
+            const achievement = document.createElement('li');
+            achievement.innerText = 'Достигнуто 1000 гривен!';
+            achievement.id = 'ach1000';
+            achievementsList.appendChild(achievement);
+        }
+        if (balance >= 10000 && !document.getElementById('ach10000')) {
+            const achievement = document.createElement('li');
+            achievement.innerText = 'Достигнуто 10000 гривен!';
+            achievement.id = 'ach10000';
+            achievementsList.appendChild(achievement);
         }
     }
 
