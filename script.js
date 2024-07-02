@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const loginPassword = document.getElementById('loginPassword');
     const loginAttemptsDisplay = document.getElementById('loginAttempts');
     const achievementsList = document.getElementById('achievements');
+    const themeToggle = document.getElementById('themeToggle');
 
     let balance = 0;
     let clickValue = 0.01;
@@ -36,6 +37,10 @@ document.addEventListener('DOMContentLoaded', function () {
         loadProgress();
     } else {
         registration.classList.remove('hidden');
+    }
+
+    if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-theme');
     }
 
     registrationForm.addEventListener('submit', function (e) {
@@ -141,6 +146,15 @@ document.addEventListener('DOMContentLoaded', function () {
         devMode.classList.add('hidden');
     });
 
+    themeToggle.addEventListener('click', function () {
+        document.body.classList.toggle('dark-theme');
+        if (document.body.classList.contains('dark-theme')) {
+            localStorage.setItem('theme', 'dark');
+        } else {
+            localStorage.setItem('theme', 'light');
+        }
+    });
+
     function updateBalance() {
         balanceDisplay.innerText = balance.toFixed(2);
     }
@@ -220,18 +234,21 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function checkAchievements() {
-        if (balance >= 1000 && !document.getElementById('ach1000')) {
-            const achievement = document.createElement('li');
-            achievement.innerText = 'Достигнуто 1000 гривен!';
-            achievement.id = 'ach1000';
-            achievementsList.appendChild(achievement);
-        }
-        if (balance >= 10000 && !document.getElementById('ach10000')) {
-            const achievement = document.createElement('li');
-            achievement.innerText = 'Достигнуто 10000 гривен!';
-            achievement.id = 'ach10000';
-            achievementsList.appendChild(achievement);
-        }
+        const achievements = [
+            { id: 'ach1000', text: 'Достигнуто 1000 гривен!', threshold: 1000 },
+            { id: 'ach10000', text: 'Достигнуто 10000 гривен!', threshold: 10000 },
+            { id: 'ach100000', text: 'Достигнуто 100000 гривен!', threshold: 100000 },
+            // Добавьте остальные достижения по аналогии
+        ];
+
+        achievements.forEach(ach => {
+            if (balance >= ach.threshold && !document.getElementById(ach.id)) {
+                const achievement = document.createElement('li');
+                achievement.innerText = ach.text;
+                achievement.id = ach.id;
+                achievementsList.appendChild(achievement);
+            }
+        });
     }
 
     function encrypt(value) {
