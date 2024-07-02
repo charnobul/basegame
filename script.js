@@ -15,6 +15,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const loginAttemptsDisplay = document.getElementById('loginAttempts');
     const achievementsList = document.getElementById('achievements');
     const themeToggle = document.getElementById('themeToggle');
+    const scrollUp = document.getElementById('scrollUp');
+    const scrollDown = document.getElementById('scrollDown');
+    const taxes = document.getElementById('taxes');
+    const taxInfo = document.getElementById('taxInfo');
+    const payTaxes = document.getElementById('payTaxes');
 
     let balance = 0;
     let clickValue = 0.01;
@@ -22,6 +27,8 @@ document.addEventListener('DOMContentLoaded', function () {
     let autoClickerCost = 500;
     let autoClickerInterval;
     let loginAttempts = 0;
+    let totalUpgrades = 0;
+    let totalAutoClickers = 0;
 
     let devClicks = [];
     const devSequence = ['top-left', 'top-right', 'top-left', 'top-left', 'bottom-right'];
@@ -29,12 +36,15 @@ document.addEventListener('DOMContentLoaded', function () {
     let lastClickTime = 0;
 
     const secretKey = 'ponchik098';
+    const dailyTax = 400;
+    let lastTaxPaid = 0;
 
     // Проверка существующих данных
     if (localStorage.getItem('userPassword')) {
         login.classList.remove('hidden');
         updateLoginAttempts();
         loadProgress();
+        checkTaxStatus();
     } else {
         registration.classList.remove('hidden');
     }
@@ -53,10 +63,14 @@ document.addEventListener('DOMContentLoaded', function () {
         localStorage.setItem('balance', '0');
         localStorage.setItem('clickValue', clickValue);
         localStorage.setItem('loginAttempts', '0');
+        localStorage.setItem('totalUpgrades', '0');
+        localStorage.setItem('totalAutoClickers', '0');
+        localStorage.setItem('lastTaxPaid', '0');
 
         registration.classList.add('hidden');
         bank.classList.remove('hidden');
         updateBalance();
+        checkTaxStatus();
     });
 
     loginForm.addEventListener('submit', function (e) {
@@ -66,9 +80,13 @@ document.addEventListener('DOMContentLoaded', function () {
         if (decrypt(localStorage.getItem('userPassword')) === userPassword) {
             balance = parseFloat(localStorage.getItem('balance'));
             clickValue = parseFloat(localStorage.getItem('clickValue'));
+            totalUpgrades = parseInt(localStorage.getItem('totalUpgrades')) || 0;
+            totalAutoClickers = parseInt(localStorage.getItem('totalAutoClickers')) || 0;
+            lastTaxPaid = parseInt(localStorage.getItem('lastTaxPaid')) || 0;
             bank.classList.remove('hidden');
             login.classList.add('hidden');
             updateBalance();
+            checkTaxStatus();
         } else {
             loginAttempts++;
             localStorage.setItem('loginAttempts', loginAttempts);
@@ -90,29 +108,35 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     upgradeClick.addEventListener('click', function () {
-        if (balance >= upgradeCost) {
-            balance -= upgradeCost;
-            clickValue += 0.01;
-            upgradeCost *= 1.5;
-            upgradeClick.innerText = `Прокачать клик (${upgradeCost.toFixed(2)} гривен)`;
-            updateBalance();
-            saveProgress();
-        } else {
-            alert('Недостаточно средств для прокачки!');
-        }
+        requestPassword(() => {
+            if (balance >= upgradeCost) {
+                balance -= upgradeCost;
+                clickValue += 0.01;
+                totalUpgrades++;
+                upgradeCost *= 1.5;
+                upgradeClick.innerText = `Прокачать клик (${upgradeCost.toFixed(2)} гривен)`;
+                updateBalance();
+                saveProgress();
+            } else {
+                alert('Недостаточно средств для прокачки!');
+            }
+        });
     });
 
     buyAutoClicker.addEventListener('click', function () {
-        if (balance >= autoClickerCost) {
-            balance -= autoClickerCost;
-            startAutoClicker();
-            autoClickerCost *= 2;
-            buyAutoClicker.innerText = `Купить автокликер (${autoClickerCost.toFixed(2)} гривен)`;
-            updateBalance();
-            saveProgress();
-        } else {
-            alert('Недостаточно средств для покупки автокликера!');
-        }
+        requestPassword(() => {
+            if (balance >= autoClickerCost) {
+                balance -= autoClickerCost;
+                totalAutoClickers++;
+                startAutoClicker();
+                autoClickerCost *= 2;
+                buyAutoClicker.innerText = `Купить автокликер (${autoClickerCost.toFixed(2)} гривен)`;
+                updateBalance();
+                saveProgress();
+            } else {
+                alert('Недостаточно средств для покупки автокликера!');
+            }
+        });
     });
 
     applyCode.addEventListener('click', function () {
@@ -133,35 +157,65 @@ document.addEventListener('DOMContentLoaded', function () {
                     case 'k': number += '2'; break;
                     case 'r': number += '3'; break;
                     case 'v': number += '4'; break;
-                    case 'p': number += '5'; break;
-                    case 'z': number += '6'; break;
-                    case 'e': number += '7'; break;
-                    case 's': number += '8'; break;
-                    case 'j': number += '9'; break;
-                    case 'm': number += '0'; break;
-                    default: number += ''; // игнорировать другие символы
+                    case 'j': number += '5'; break;
+                    case 'e': number += '6'; break;
+                    case 'n': number += '7'; break;
+                    case 'q': number += '8'; break;
+                    case 'd': number += '9'; break;
+                    case 'y': number += '0'; break;
+                    default: break;
                 }
             });
-            const parsedNumber = parseFloat(number);
-            if (!isNaN(parsedNumber)) {
-                balance += parsedNumber;
+            const amount = parseFloat(number);
+            if (!isNaN(amount)) {
+                balance += amount;
             } else {
                 alert('Неверный код. Пожалуйста, введите правильный код.');
             }
+        } else {
+            alert('Неверный код. Пожалуйста, введите правильный код.');
         }
         updateBalance();
         saveProgress();
-        devMode.classList.add('hidden');
+        devCode.value = '';
     });
 
     themeToggle.addEventListener('click', function () {
         document.body.classList.toggle('dark-theme');
-        if (document.body.classList.contains('dark-theme')) {
-            localStorage.setItem('theme', 'dark');
-        } else {
-            localStorage.setItem('theme', 'light');
-        }
+        localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
     });
+
+    scrollUp.addEventListener('click', function () {
+        window.scrollBy(0, -100);
+    });
+
+    scrollDown.addEventListener('click', function () {
+        window.scrollBy(0, 100);
+    });
+
+    payTaxes.addEventListener('click', function () {
+        requestPassword(() => {
+            if (balance >= dailyTax) {
+                balance -= dailyTax;
+                lastTaxPaid = Date.now();
+                localStorage.setItem('lastTaxPaid', lastTaxPaid);
+                updateBalance();
+                checkTaxStatus();
+                saveProgress();
+            } else {
+                alert('Недостаточно средств для оплаты налогов!');
+            }
+        });
+    });
+
+    function startAutoClicker() {
+        if (autoClickerInterval) clearInterval(autoClickerInterval);
+        autoClickerInterval = setInterval(() => {
+            balance += clickValue * totalAutoClickers;
+            updateBalance();
+            saveProgress();
+        }, 1000);
+    }
 
     function updateBalance() {
         balanceDisplay.innerText = balance.toFixed(2);
@@ -169,76 +223,50 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function saveProgress() {
         localStorage.setItem('balance', balance.toFixed(2));
-        localStorage.setItem('clickValue', clickValue.toFixed(2));
+        localStorage.setItem('clickValue', clickValue);
+        localStorage.setItem('totalUpgrades', totalUpgrades);
+        localStorage.setItem('totalAutoClickers', totalAutoClickers);
     }
 
     function loadProgress() {
         balance = parseFloat(localStorage.getItem('balance')) || 0;
         clickValue = parseFloat(localStorage.getItem('clickValue')) || 0.01;
-        updateBalance();
+        totalUpgrades = parseInt(localStorage.getItem('totalUpgrades')) || 0;
+        totalAutoClickers = parseInt(localStorage.getItem('totalAutoClickers')) || 0;
+        upgradeCost = 100 * Math.pow(1.5, totalUpgrades);
+        autoClickerCost = 500 * Math.pow(2, totalAutoClickers);
         upgradeClick.innerText = `Прокачать клик (${upgradeCost.toFixed(2)} гривен)`;
+        buyAutoClicker.innerText = `Купить автокликер (${autoClickerCost.toFixed(2)} гривен)`;
+        updateBalance();
+        startAutoClicker();
+        checkAchievements();
     }
 
     function updateLoginAttempts() {
         loginAttempts = parseInt(localStorage.getItem('loginAttempts')) || 0;
-        loginAttemptsDisplay.innerText = `Осталось попыток: ${5 - loginAttempts}`;
+        loginAttemptsDisplay.innerText = `Попытки входа: ${loginAttempts}`;
     }
 
-    function handleDevClick(e) {
+    function checkTaxStatus() {
         const now = Date.now();
-        const rect = coin.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        let position = '';
-        if (x < rect.width / 2 && y < rect.height / 2) {
-            position = 'top-left';
-        } else if (x > rect.width / 2 && y < rect.height / 2) {
-            position = 'top-right';
-        } else if (x > rect.width / 2 && y > rect.height / 2) {
-            position = 'bottom-right';
-        }
-
-        if (devClicks.length === 0 || (now - lastClickTime <= maxDelay)) {
-            devClicks.push(position);
-            if (devClicks.length === devSequence.length) {
-                if (devClicks.join('') === devSequence.join('')) {
-                    requestDeveloperPassword();
-                }
-                devClicks = [];
-            }
+        const oneDay = 24 * 60 * 60 * 1000;
+        const daysPassed = Math.floor((now - lastTaxPaid) / oneDay);
+        if (daysPassed >= 1) {
+            payTaxes.disabled = false;
+            payTaxes.style.backgroundColor = 'green';
         } else {
-            devClicks = [position];
-        }
-        lastClickTime = now;
-    }
-
-    function requestDeveloperPassword() {
-        let attempts = 3;
-        while (attempts > 0) {
-            const password = prompt('Введите пароль для режима разработчика:');
-            if (password === secretKey) {
-                devMode.classList.remove('hidden');
-                return;
-            } else {
-                attempts--;
-                if (attempts > 0) {
-                    alert(`Неверный пароль. Осталось попыток: ${attempts}`);
-                } else {
-                    alert('Слишком много неверных попыток. Попробуйте позже.');
-                }
-            }
+            payTaxes.disabled = true;
+            payTaxes.style.backgroundColor = 'gray';
         }
     }
 
-    function startAutoClicker() {
-        if (autoClickerInterval) clearInterval(autoClickerInterval);
-        autoClickerInterval = setInterval(function () {
-            balance += clickValue;
-            updateBalance();
-            saveProgress();
-            checkAchievements();
-        }, 1000);
+    function requestPassword(callback) {
+        const password = prompt('Введите пароль:');
+        if (password && decrypt(localStorage.getItem('userPassword')) === password) {
+            callback();
+        } else {
+            alert('Неверный пароль!');
+        }
     }
 
     function checkAchievements() {
@@ -275,8 +303,30 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    function handleDevClick(e) {
+        const rect = e.target.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const now = Date.now();
+
+        if (devClicks.length === 0 || now - lastClickTime > maxDelay) {
+            devClicks = [];
+        }
+        lastClickTime = now;
+
+        const quadrant = (x < rect.width / 2 ? 'left' : 'right') + '-' + (y < rect.height / 2 ? 'top' : 'bottom');
+        devClicks.push(quadrant);
+
+        if (devClicks.length > devSequence.length) {
+            devClicks.shift();
+        }
+
+        if (devClicks.join('-') === devSequence.join('-')) {
+            devMode.classList.remove('hidden');
+        }
+    }
+
     function encrypt(value) {
-        // Простой XOR шифр
         let result = '';
         for (let i = 0; i < value.length; i++) {
             result += String.fromCharCode(value.charCodeAt(i) ^ 13);
@@ -285,7 +335,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function decrypt(value) {
-        // Простой XOR шифр (для дешифровки)
         let result = '';
         for (let i = 0; i < value.length; i++) {
             result += String.fromCharCode(value.charCodeAt(i) ^ 13);
