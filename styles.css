@@ -1,3 +1,4 @@
+/* styles.css */
 body {
     font-family: Arial, sans-serif;
     background: linear-gradient(135deg, #00a8e6, #0073aa);
@@ -50,4 +51,9 @@ form {
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+#balance {
+    font-size: 24px;
+    font-weight: bold;
 }
