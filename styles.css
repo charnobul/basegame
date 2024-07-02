@@ -2,17 +2,9 @@ body {
     font-family: Arial, sans-serif;
     background: linear-gradient(135deg, #00a8e6, #0073aa);
     color: #333;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
     margin: 0;
-    transition: background 0.5s, color 0.5s;
-}
-
-body.dark-theme {
-    background: linear-gradient(135deg, #333, #555);
-    color: #ccc;
+    padding: 20px;
+    overflow-y: auto;
 }
 
 .container {
@@ -21,10 +13,7 @@ body.dark-theme {
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.dark-theme .container {
-    background-color: rgba(0, 0, 0, 0.7);
+    margin-bottom: 20px;
 }
 
 .hidden {
@@ -52,10 +41,6 @@ button:hover {
     background-color: #45a049;
 }
 
-.dark-theme button {
-    background-color: #666;
-}
-
 h2, h3 {
     text-align: center;
 }
@@ -66,20 +51,36 @@ form {
     align-items: center;
 }
 
-#achievements {
-    list-style: none;
-    padding: 0;
+.achievement {
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    text-align: left;
 }
 
-#themeToggle {
-    margin-top: 20px;
-    cursor: pointer;
-    background-color: #4CAF50;
+.notification {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background-color: rgba(0, 128, 0, 0.8);
     color: white;
-    border: none;
-    padding: 10px 20px;
+    padding: 10px;
+    border-radius: 5px;
+    display: none;
 }
 
-.dark-theme #themeToggle {
+.dark-theme {
+    background: linear-gradient(135deg, #333, #000);
+    color: #ccc;
+}
+
+.dark-theme .container {
+    background-color: rgba(50, 50, 50, 0.9);
+    border-color: #4CAF50;
+}
+
+.dark-theme #coin {
     background-color: #666;
 }
