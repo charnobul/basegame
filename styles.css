@@ -7,6 +7,12 @@ body {
     align-items: center;
     height: 100vh;
     margin: 0;
+    transition: background 0.5s, color 0.5s;
+}
+
+body.dark-theme {
+    background: linear-gradient(135deg, #333, #555);
+    color: #ccc;
 }
 
 .container {
@@ -15,6 +21,10 @@ body {
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.dark-theme .container {
+    background-color: rgba(0, 0, 0, 0.7);
 }
 
 .hidden {
@@ -42,6 +52,10 @@ button:hover {
     background-color: #45a049;
 }
 
+.dark-theme button {
+    background-color: #666;
+}
+
 h2, h3 {
     text-align: center;
 }
@@ -52,20 +66,20 @@ form {
     align-items: center;
 }
 
-#balance {
-    font-size: 24px;
-    font-weight: bold;
-}
-
-ul {
-    list-style-type: none;
+#achievements {
+    list-style: none;
     padding: 0;
 }
 
-li {
-    background: #4CAF50;
+#themeToggle {
+    margin-top: 20px;
+    cursor: pointer;
+    background-color: #4CAF50;
     color: white;
-    padding: 5px;
-    margin: 5px 0;
-    border-radius: 5px;
+    border: none;
+    padding: 10px 20px;
+}
+
+.dark-theme #themeToggle {
+    background-color: #666;
 }
