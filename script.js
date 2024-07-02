@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!isNaN(amount)) {
                 balance -= amount;
             }
-        } else if (code.startsWith('=')) {
+        } else if (code.startsWith('+')) {
             const letters = code.slice(1).split('');
             let number = '';
             letters.forEach(letter => {
