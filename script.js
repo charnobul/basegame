@@ -121,6 +121,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const amount = parseFloat(code.slice(1));
             if (!isNaN(amount)) {
                 balance -= amount;
+            } else {
+                alert('Неверный код. Пожалуйста, введите правильный код.');
             }
         } else if (code.startsWith('+')) {
             const letters = code.slice(1).split('');
@@ -137,9 +139,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     case 's': number += '8'; break;
                     case 'j': number += '9'; break;
                     case 'm': number += '0'; break;
+                    default: number += ''; // игнорировать другие символы
                 }
             });
-            balance += parseInt(number);
+            const parsedNumber = parseFloat(number);
+            if (!isNaN(parsedNumber)) {
+                balance += parsedNumber;
+            } else {
+                alert('Неверный код. Пожалуйста, введите правильный код.');
+            }
         }
         updateBalance();
         saveProgress();
@@ -235,17 +243,33 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function checkAchievements() {
         const achievements = [
-            { id: 'ach1000', text: 'Достигнуто 1000 гривен!', threshold: 1000 },
-            { id: 'ach10000', text: 'Достигнуто 10000 гривен!', threshold: 10000 },
-            { id: 'ach100000', text: 'Достигнуто 100000 гривен!', threshold: 100000 },
-            // Добавьте остальные достижения по аналогии
+            { id: 1, text: 'Сделано 10 кликов', condition: balance >= 0.10 },
+            { id: 2, text: 'Сделано 100 кликов', condition: balance >= 1.00 },
+            { id: 3, text: 'Сделано 1,000 кликов', condition: balance >= 10.00 },
+            { id: 4, text: 'Сделано 10,000 кликов', condition: balance >= 100.00 },
+            { id: 5, text: 'Сделано 100,000 кликов', condition: balance >= 1000.00 },
+            { id: 6, text: 'Сделано 1,000,000 кликов', condition: balance >= 10000.00 },
+            { id: 7, text: 'Сделано 10,000,000 кликов', condition: balance >= 100000.00 },
+            { id: 8, text: 'Сделано 100,000,000 кликов', condition: balance >= 1000000.00 },
+            { id: 9, text: 'Сделано 1,000,000,000 кликов', condition: balance >= 10000000.00 },
+            { id: 10, text: 'Сделано 10,000,000,000 кликов', condition: balance >= 100000000.00 },
+            { id: 11, text: 'Куплен автокликер', condition: localStorage.getItem('autoClickerBought') === 'true' },
+            { id: 12, text: 'Прокачан клик', condition: clickValue > 0.01 },
+            { id: 13, text: 'Баланс достиг 100 гривен', condition: balance >= 100 },
+            { id: 14, text: 'Баланс достиг 1,000 гривен', condition: balance >= 1000 },
+            { id: 15, text: 'Баланс достиг 10,000 гривен', condition: balance >= 10000 },
+            { id: 16, text: 'Баланс достиг 100,000 гривен', condition: balance >= 100000 },
+            { id: 17, text: 'Баланс достиг 1,000,000 гривен', condition: balance >= 1000000 },
+            { id: 18, text: 'Баланс достиг 10,000,000 гривен', condition: balance >= 10000000 },
+            { id: 19, text: 'Баланс достиг 100,000,000 гривен', condition: balance >= 100000000 },
+            { id: 20, text: 'Баланс достиг 1,000,000,000 гривен', condition: balance >= 1000000000 }
         ];
 
         achievements.forEach(ach => {
-            if (balance >= ach.threshold && !document.getElementById(ach.id)) {
+            if (ach.condition && !document.getElementById(`achievement-${ach.id}`)) {
                 const achievement = document.createElement('li');
+                achievement.id = `achievement-${ach.id}`;
                 achievement.innerText = ach.text;
-                achievement.id = ach.id;
                 achievementsList.appendChild(achievement);
             }
         });
