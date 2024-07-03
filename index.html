@@ -7,30 +7,34 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="registration">
-        <h1>Регистрация</h1>
-        <form id="registrationForm">
-            <input type="text" id="name" placeholder="Имя" required>
-            <input type="password" id="password" placeholder="Пароль" required>
-            <button type="submit">Зарегистрироваться</button>
-        </form>
-    </div>
+    <div class="container">
+        <div id="registration" class="hidden">
+            <h1>Регистрация</h1>
+            <form id="registrationForm">
+                <input type="text" id="name" placeholder="Имя" required>
+                <input type="password" id="password" placeholder="Пароль" required>
+                <button type="submit">Зарегистрироваться</button>
+            </form>
+        </div>
 
-    <div id="login" class="hidden">
-        <h1>Вход</h1>
-        <form id="loginForm">
-            <input type="password" id="loginPassword" placeholder="Пароль" required>
-            <button type="submit">Войти</button>
-        </form>
-        <div id="loginAttempts"></div>
-    </div>
+        <div id="login" class="hidden">
+            <h1>Вход</h1>
+            <form id="loginForm">
+                <input type="password" id="loginPassword" placeholder="Пароль" required>
+                <button type="submit">Войти</button>
+            </form>
+            <div id="loginAttempts"></div>
+        </div>
 
-    <div id="bank" class="hidden">
-        <h1>Clicker Game</h1>
-        <div id="balance">0.00</div>
-        <button id="coin">Клик</button>
-        <button id="upgradeClick">Прокачать клик (100 гривен)</button>
-        <button id="buyAutoClicker">Купить автокликер (500 гривен)</button>
+        <div id="bank" class="hidden">
+            <h1>Clicker Game</h1>
+            <div id="balance">0.00</div>
+            <button id="coin">Клик</button>
+            <button id="upgradeClick">Прокачать клик (100 гривен)</button>
+            <button id="buyAutoClicker">Купить автокликер (500 гривен)</button>
+            <button id="payTaxes">Оплатить налоги (400 гривен)</button>
+            <div id="achievements"></div>
+        </div>
     </div>
 
     <script src="script.js"></script>
