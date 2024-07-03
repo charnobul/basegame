@@ -112,14 +112,15 @@ document.addEventListener('DOMContentLoaded', function () {
             if (balance >= upgradeCost) {
                 balance -= upgradeCost;
                 clickValue += 0.01;
+                total```javascript
                 totalUpgrades++;
-                upgradeCost *= 1.5;
-                upgradeClick.innerText = `Прокачать клик (${upgradeCost.toFixed(2)} гривен)`;
+                upgradeCost = Math.round(upgradeCost * 1.1);
                 updateBalance();
+                updateUpgradeCost();
                 saveProgress();
                 showNotification("Клик прокачан! Теперь вы зарабатываете " + clickValue.toFixed(2) + " гривен за клик.");
             } else {
-                alert('Недостаточно средств для прокачки!');
+                alert('Недостаточно средств для прокачки.');
             }
         });
     });
@@ -129,102 +130,64 @@ document.addEventListener('DOMContentLoaded', function () {
             if (balance >= autoClickerCost) {
                 balance -= autoClickerCost;
                 totalAutoClickers++;
-                startAutoClicker();
-                autoClickerCost *= 2;
-                buyAutoClicker.innerText = `Купить автокликер (${autoClickerCost.toFixed(2)} гривен)`;
+                autoClickerCost = Math.round(autoClickerCost * 1.15);
                 updateBalance();
+                updateAutoClickerCost();
+                startAutoClicker();
                 saveProgress();
-                showNotification("Автокликер куплен! Теперь у вас " + totalAutoClickеров + " автокликеров.");
+                showNotification("Куплен автокликер! Теперь у вас " + totalAutoClickers + " автокликеров.");
             } else {
-                alert('Недостаточно средств для покупки автокликера!');
+                alert('Недостаточно средств для покупки автокликера.');
             }
         });
     });
 
     applyCode.addEventListener('click', function () {
-        const code = devCode.value.trim();
-        if (code.startsWith('+')) {
-            const amount = parseFloat(code.slice(1).replace(/[^\d.]/g, ''));
-            if (!isNaN(amount)) {
-                balance += amount;
-                showNotification("Введено " + amount.toFixed(2) + " гривен!");
-                updateBalance();
-                saveProgress();
-            } else {
-                alert('Неверный код. Пожалуйста, введите правильный код.');
-            }
-        }
-    });
-
-    payTaxes.addEventListener('click', function () {
-        if (balance >= dailyTax) {
-            balance -= dailyTax;
-            lastTaxPaid = Date.now();
-            payTaxes.style.backgroundColor = 'gray';
-            payTaxes.disabled = true;
+        if (devCode.value === secretKey) {
+            balance += 1000000;
             updateBalance();
             saveProgress();
-            showNotification("Налог оплачен!");
+            showNotification("Вы получили 1,000,000 гривен!");
         } else {
-            alert('Недостаточно средств для оплаты налога!');
+            alert('Неверный код.');
         }
     });
 
     themeToggle.addEventListener('click', function () {
         document.body.classList.toggle('dark-theme');
-        if (document.body.classList.contains('dark-theme')) {
-            localStorage.setItem('theme', 'dark');
-        } else {
-            localStorage.setItem('theme', 'light');
-        }
+        localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
+    });
+
+    payTaxes.addEventListener('click', function () {
+        requestPassword(() => {
+            if (balance >= dailyTax) {
+                balance -= dailyTax;
+                lastTaxPaid = Date.now();
+                updateBalance();
+                saveProgress();
+                checkTaxStatus();
+                showNotification("Налог оплачен!");
+            } else {
+                alert('Недостаточно средств для оплаты налога.');
+            }
+        });
     });
 
     function updateBalance() {
         balanceDisplay.innerText = balance.toFixed(2);
-        checkTaxStatus();
     }
 
-    function saveProgress() {
-        localStorage.setItem('balance', balance.toString());
-        localStorage.setItem('clickValue', clickValue.toString());
-        localStorage.setItem('totalUpgrades', totalUpgrades.toString());
-        localStorage.setItem('totalAutoClickers', totalAutoClickers.toString());
-        localStorage.setItem('lastTaxPaid', lastTaxPaid.toString());
+    function updateUpgradeCost() {
+        upgradeClick.innerText = `Прокачать клик (${upgradeCost} гривен)`;
     }
 
-    function loadProgress() {
-        balance = parseFloat(localStorage.getItem('balance')) || 0;
-        clickValue = parseFloat(localStorage.getItem('clickValue')) || 0.01;
-        totalUpgrades = parseInt(localStorage.getItem('totalUpgrades')) || 0;
-        totalAutoClickers = parseInt(localStorage.getItem('totalAutoClickers')) || 0;
-        lastTaxPaid = parseInt(localStorage.getItem('lastTaxPaid')) || 0;
-        upgradeCost = 100 * Math.pow(1.5, totalUpgrades);
-        autoClickerCost = 500 * Math.pow(2, totalAutoClickers);
-        upgradeClick.innerText = `Прокачать клик (${upgradeCost.toFixed(2)} гривен)`;
-        buyAutoClicker.innerText = `Купить автокликер (${autoClickerCost.toFixed(2)} гривен)`;
-        updateBalance();
-        if (totalAutoClickers > 0) {
-            startAutoClicker();
-        }
-    }
-
-    function encrypt(text) {
-        return btoa(text);
-    }
-
-    function decrypt(text) {
-        return atob(text);
-    }
-
-    function updateLoginAttempts() {
-        loginAttemptsDisplay.innerText = `Попытки входа: ${loginAttempts}`;
+    function updateAutoClickerCost() {
+        buyAutoClicker.innerText = `Купить автокликер (${autoClickerCost} гривен)`;
     }
 
     function startAutoClicker() {
-        if (autoClickerInterval) clearInterval(autoClickerInterval);
-        autoClickerInterval = setInterval(() => {
-            balance += totalAutoClickers * clickValue;
-            update```javascript
+        clearInterval(autoClickerInterval);
+        autoClickerInterval = setInterval(function () {
             balance += totalAutoClickers * clickValue;
             updateBalance();
             saveProgress();
@@ -315,5 +278,38 @@ document.addEventListener('DOMContentLoaded', function () {
         setTimeout(() => {
             notification.classList.remove('visible');
         }, 3000);
+    }
+
+    function encrypt(text) {
+        return btoa(text);
+    }
+
+    function decrypt(text) {
+        return atob(text);
+    }
+
+    function saveProgress() {
+        localStorage.setItem('balance', balance.toString());
+        localStorage.setItem('clickValue', clickValue.toString());
+        localStorage.setItem('totalUpgrades', totalUpgrades.toString());
+        localStorage.setItem('totalAutoClickers', totalAutoClickers.toString());
+        localStorage.setItem('lastTaxPaid', lastTaxPaid.toString());
+    }
+
+    function loadProgress() {
+        balance = parseFloat(localStorage.getItem('balance')) || 0;
+        clickValue = parseFloat(localStorage.getItem('clickValue')) || 0.01;
+        totalUpgrades = parseInt(localStorage.getItem('totalUpgrades')) || 0;
+        totalAutoClickers = parseInt(localStorage.getItem('totalAutoClickers')) || 0;
+        lastTaxPaid = parseInt(localStorage.getItem('lastTaxPaid')) || 0;
+        updateBalance();
+        updateUpgradeCost();
+        updateAutoClickerCost();
+        startAutoClicker();
+    }
+
+    function updateLoginAttempts() {
+        loginAttempts = parseInt(localStorage.getItem('loginAttempts')) || 0;
+        loginAttemptsDisplay.innerText = `Попыток входа: ${loginAttempts}`;
     }
 });
