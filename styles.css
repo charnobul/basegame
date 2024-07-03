@@ -1,86 +1,88 @@
 body {
     font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #00a8e6, #0073aa);
-    color: #333;
     margin: 0;
-    padding: 20px;
-    overflow-y: auto;
-}
-
-.container {
-    background-color: rgba(255, 255, 255, 0.9);
-    border: 2px solid #4CAF50;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
 }
 
 .hidden {
     display: none;
 }
 
-#coin {
-    width: 100px;
-    height: 100px;
-    background-color: #4CAF50;
-    margin: 20px auto;
-    cursor: pointer;
-}
-
-button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    margin-top: 10px;
-}
-
-button:hover {
-    background-color: #45a049;
-}
-
-h2, h3 {
+h1, h2 {
     text-align: center;
 }
 
 form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    text-align: center;
 }
 
-.achievement {
-    background-color: #f9f9f9;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+input {
+    display: block;
+    margin: 10px auto;
     padding: 10px;
-    margin-bottom: 10px;
-    text-align: left;
+    font-size: 16px;
+}
+
+button {
+    display: block;
+    margin: 10px auto;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#bank {
+    text-align: center;
+    padding: 20px;
+}
+
+#balance {
+    font-size: 24px;
+    margin: 20px 0;
+}
+
+#coin, #upgradeClick, #buyAutoClicker, #toggleTheme, #payTaxes {
+    padding: 10px 20px;
+    margin: 10px;
+    font-size: 16px;
+}
+
+#devMode {
+    margin-top: 20px;
+}
+
+#achievements {
+    list-style-type: none;
+    padding: 0;
+}
+
+#achievements li {
+    background-color: #ddd;
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.dark-theme {
+    background-color: #333;
+    color: #f4f4f4;
 }
 
 .notification {
     position: fixed;
     bottom: 20px;
-    left: 20px;
-    background-color: rgba(0, 128, 0, 0.8);
-    color: white;
-    padding: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 10px 20px;
     border-radius: 5px;
-    display: none;
+    opacity: 0;
+    transition: opacity 0.5s;
 }
 
-.dark-theme {
-    background: linear-gradient(135deg, #333, #000);
-    color: #ccc;
-}
-
-.dark-theme .container {
-    background-color: rgba(50, 50, 50, 0.9);
-    border-color: #4CAF50;
-}
-
-.dark-theme #coin {
-    background-color: #666;
+.notification.visible {
+    opacity: 1;
 }
