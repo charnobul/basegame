@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="registration" class="hidden">
+    <div id="registration">
         <h1>Регистрация</h1>
         <form id="registrationForm">
             <input type="text" id="name" placeholder="Имя" required>
@@ -31,21 +31,7 @@
         <button id="coin">Клик</button>
         <button id="upgradeClick">Прокачать клик (100 гривен)</button>
         <button id="buyAutoClicker">Купить автокликер (500 гривен)</button>
-        <div id="devMode" class="hidden">
-            <input type="text" id="devCode" placeholder="Введите код">
-            <button id="applyCode">Применить код</button>
-        </div>
-        <button id="toggleTheme">Переключить тему</button>
-        <h2>Достижения</h2>
-        <ul id="achievements"></ul>
-        <div id="taxes">
-            <h2>Налоги</h2>
-            <div id="taxInfo">Налог необходимо оплатить!</div>
-            <button id="payTaxes">Оплатить налог</button>
-        </div>
     </div>
-
-    <div id="notification" class="notification"></div>
 
     <script src="script.js"></script>
 </body>
