@@ -4,7 +4,6 @@ body {
     padding: 0;
     background-color: #f4f4f4;
     color: #333;
-    overflow-y: scroll; /* Добавлено для прокрутки страницы */
 }
 
 .hidden {
@@ -44,46 +43,8 @@ button {
     margin: 20px 0;
 }
 
-#coin, #upgradeClick, #buyAutoClicker, #toggleTheme, #payTaxes {
+#coin, #upgradeClick, #buyAutoClicker {
     padding: 10px 20px;
     margin: 10px;
     font-size: 16px;
-}
-
-#devMode {
-    margin-top: 20px;
-}
-
-#achievements {
-    list-style-type: none;
-    padding: 0;
-}
-
-#achievements li {
-    background-color: #ddd;
-    margin: 5px 0;
-    padding: 10px;
-    border-radius: 5px;
-}
-
-.dark-theme {
-    background-color: #333;
-    color: #f4f4f4;
-}
-
-.notification {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #333;
-    color: #fff;
-    padding: 10px 20px;
-    border-radius: 5px;
-    opacity: 0;
-    transition: opacity 0.5s;
-}
-
-.notification.visible {
-    opacity: 1;
 }
